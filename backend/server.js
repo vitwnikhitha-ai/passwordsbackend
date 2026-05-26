@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey_for_development';
+
 const authRoutes = require('./routes/authRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
 const path = require('path');

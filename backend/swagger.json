@@ -7,10 +7,6 @@
   },
   "servers": [
     {
-      "url": "/",
-      "description": "Current Host (Auto-detect)"
-    },
-    {
       "url": "https://passwordsbackend.vercel.app",
       "description": "Vercel production server"
     },

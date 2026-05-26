@@ -27,20 +27,37 @@ app.get('/api-docs', (req, res) => {
 app.get('/', (req, res) => {
   res.json({ message: 'Password Manager API is running' });
 });
-app.use('/api/auth', authRoutes);
-app.use('/api/passwords', passwordRoutes);
-
 // Database Connection
 const mongoURI = process.env.MONGO_URI || 'mongodb+srv://Vercel-Admin-atlas-bisque-drawer:gyUVMvDwOD9WWNbc@atlas-bisque-drawer.bev7yzj.mongodb.net/password-manager?retryWrites=true&w=majority';
 
 mongoose.set('bufferCommands', false);
 
-mongoose
-  .connect(mongoURI, {
-    serverSelectionTimeoutMS: 5000 // 5 seconds timeout
-  })
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+const dbConnectionPromise = mongoose.connect(mongoURI, {
+  serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+})
+.then((m) => {
+  console.log('MongoDB connected');
+  return m;
+})
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+  throw err;
+});
+
+// Database Connection Middleware for APIs
+app.use('/api', (req, res, next) => {
+  if (mongoose.connection.readyState === 1) {
+    return next();
+  }
+  dbConnectionPromise
+    .then(() => next())
+    .catch((err) => {
+      res.status(500).json({ message: 'Database connection failed: ' + err.message });
+    });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/passwords', passwordRoutes);
 
 const PORT = process.env.PORT || 5000;
 if (require.main === module) {

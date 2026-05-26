@@ -31,8 +31,12 @@ app.use('/api/passwords', passwordRoutes);
 // Database Connection
 const mongoURI = process.env.MONGO_URI || 'mongodb+srv://Vercel-Admin-atlas-bisque-drawer:gyUVMvDwOD9WWNbc@atlas-bisque-drawer.bev7yzj.mongodb.net/password-manager?retryWrites=true&w=majority';
 
+mongoose.set('bufferCommands', false);
+
 mongoose
-  .connect(mongoURI)
+  .connect(mongoURI, {
+    serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+  })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error:', err));
 

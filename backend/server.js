@@ -5,11 +5,34 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const passwordRoutes = require('./routes/passwordRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Swagger API Documentation
+const swaggerOptions = {
+  customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css'
+};
+app.use('/api-docs', (req, res, next) => {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.get('host');
+  const dynamicSwagger = JSON.parse(JSON.stringify(swaggerDocument));
+  dynamicSwagger.servers = [
+    {
+      url: `${protocol}://${host}`,
+      description: 'Current Environment'
+    },
+    ...swaggerDocument.servers.filter(s => !s.url.includes(host))
+  ];
+  req.swaggerDoc = dynamicSwagger;
+  next();
+}, swaggerUi.serve, (req, res) => {
+  swaggerUi.setup(req.swaggerDoc, swaggerOptions)(req, res);
+});
 
 // Routes
 app.get('/', (req, res) => {

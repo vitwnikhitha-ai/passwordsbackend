@@ -11,5 +11,10 @@
       "src": "/(.*)",
       "dest": "backend/server.js"
     }
-  ]
+  ],
+  "functions": {
+    "backend/server.js": {
+      "includeFiles": "node_modules/swagger-ui-dist/**"
+    }
+  }
 }
